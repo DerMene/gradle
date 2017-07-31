@@ -17,6 +17,7 @@
 package org.gradle.nativeplatform.toolchain.internal.msvcpp;
 
 import org.gradle.api.internal.file.FileResolver;
+import org.gradle.internal.concurrent.ExecutorFactory;
 import org.gradle.internal.operations.BuildOperationExecutor;
 import org.gradle.internal.os.OperatingSystem;
 import org.gradle.internal.reflect.Instantiator;
@@ -45,6 +46,7 @@ public class VisualCppToolChain extends ExtendableToolChain<VisualCppPlatformToo
     public static final String DEFAULT_NAME = "visualCpp";
 
     private final ExecActionFactory execActionFactory;
+    private final ExecutorFactory executorFactory;
     private final VisualStudioLocator visualStudioLocator;
     private final WindowsSdkLocator windowsSdkLocator;
     private final UcrtLocator ucrtLocator;
@@ -60,7 +62,8 @@ public class VisualCppToolChain extends ExtendableToolChain<VisualCppPlatformToo
     private ToolChainAvailability availability;
 
     public VisualCppToolChain(String name, BuildOperationExecutor buildOperationExecutor, OperatingSystem operatingSystem, FileResolver fileResolver, ExecActionFactory execActionFactory,
-                              CompilerOutputFileNamingSchemeFactory compilerOutputFileNamingSchemeFactory, VisualStudioLocator visualStudioLocator, WindowsSdkLocator windowsSdkLocator, UcrtLocator ucrtLocator, Instantiator instantiator) {
+                              CompilerOutputFileNamingSchemeFactory compilerOutputFileNamingSchemeFactory, VisualStudioLocator visualStudioLocator, WindowsSdkLocator windowsSdkLocator,
+                              UcrtLocator ucrtLocator, Instantiator instantiator, ExecutorFactory executorFactory) {
         super(name, buildOperationExecutor, operatingSystem, fileResolver);
         this.name = name;
         this.operatingSystem = operatingSystem;
@@ -70,6 +73,7 @@ public class VisualCppToolChain extends ExtendableToolChain<VisualCppPlatformToo
         this.windowsSdkLocator = windowsSdkLocator;
         this.ucrtLocator = ucrtLocator;
         this.instantiator = instantiator;
+        this.executorFactory = executorFactory;
     }
 
     @Override
@@ -119,7 +123,7 @@ public class VisualCppToolChain extends ExtendableToolChain<VisualCppPlatformToo
         DefaultVisualCppPlatformToolChain configurableToolChain = instantiator.newInstance(DefaultVisualCppPlatformToolChain.class, targetPlatform, instantiator);
         configureActions.execute(configurableToolChain);
 
-        return new VisualCppPlatformToolProvider(buildOperationExecutor, targetPlatform.getOperatingSystem(), configurableToolChain.tools, visualCpp, windowsSdk, ucrt, targetPlatform, execActionFactory, compilerOutputFileNamingSchemeFactory);
+        return new VisualCppPlatformToolProvider(buildOperationExecutor, targetPlatform.getOperatingSystem(), configurableToolChain.tools, visualCpp, windowsSdk, ucrt, targetPlatform, execActionFactory, compilerOutputFileNamingSchemeFactory, executorFactory);
     }
 
     private ToolChainAvailability getAvailability() {

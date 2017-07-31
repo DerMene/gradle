@@ -21,6 +21,7 @@ import org.gradle.api.NamedDomainObjectFactory;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.internal.file.FileResolver;
+import org.gradle.internal.concurrent.ExecutorFactory;
 import org.gradle.internal.operations.BuildOperationExecutor;
 import org.gradle.internal.os.OperatingSystem;
 import org.gradle.internal.reflect.Instantiator;
@@ -53,6 +54,7 @@ public class SwiftCompilerPlugin implements Plugin<Project> {
         public static void addToolChain(NativeToolChainRegistryInternal toolChainRegistry, ServiceRegistry serviceRegistry) {
             final FileResolver fileResolver = serviceRegistry.get(FileResolver.class);
             final ExecActionFactory execActionFactory = serviceRegistry.get(ExecActionFactory.class);
+            final ExecutorFactory executorFactory = serviceRegistry.get(ExecutorFactory.class);
             final CompilerOutputFileNamingSchemeFactory compilerOutputFileNamingSchemeFactory = serviceRegistry.get(CompilerOutputFileNamingSchemeFactory.class);
             final Instantiator instantiator = serviceRegistry.get(Instantiator.class);
             final BuildOperationExecutor buildOperationExecutor = serviceRegistry.get(BuildOperationExecutor.class);
@@ -60,7 +62,7 @@ public class SwiftCompilerPlugin implements Plugin<Project> {
 
             toolChainRegistry.registerFactory(Swiftc.class, new NamedDomainObjectFactory<Swiftc>() {
                 public Swiftc create(String name) {
-                    return instantiator.newInstance(SwiftcToolChain.class, name, buildOperationExecutor, OperatingSystem.current(), fileResolver, execActionFactory, compilerOutputFileNamingSchemeFactory, metaDataProviderFactory, instantiator);
+                    return instantiator.newInstance(SwiftcToolChain.class, name, buildOperationExecutor, OperatingSystem.current(), fileResolver, execActionFactory, compilerOutputFileNamingSchemeFactory, metaDataProviderFactory, instantiator, executorFactory);
                 }
             });
             toolChainRegistry.registerDefaultToolChain(SwiftcToolChain.DEFAULT_NAME, Swiftc.class);

@@ -17,6 +17,7 @@
 package org.gradle.nativeplatform.toolchain.internal.clang;
 
 import org.gradle.api.internal.file.FileResolver;
+import org.gradle.internal.concurrent.ExecutorFactory;
 import org.gradle.internal.operations.BuildOperationExecutor;
 import org.gradle.internal.os.OperatingSystem;
 import org.gradle.internal.reflect.Instantiator;
@@ -30,8 +31,8 @@ import org.gradle.process.internal.ExecActionFactory;
 public class ClangToolChain extends AbstractGccCompatibleToolChain implements Clang {
     public static final String DEFAULT_NAME = "clang";
 
-    public ClangToolChain(String name, BuildOperationExecutor buildOperationExecutor, OperatingSystem operatingSystem, FileResolver fileResolver, ExecActionFactory execActionFactory, CompilerOutputFileNamingSchemeFactory compilerOutputFileNamingSchemeFactory, CompilerMetaDataProviderFactory metaDataProviderFactory, Instantiator instantiator) {
-        super(name, buildOperationExecutor, operatingSystem, fileResolver, execActionFactory, compilerOutputFileNamingSchemeFactory, metaDataProviderFactory.clang(), instantiator);
+    public ClangToolChain(String name, BuildOperationExecutor buildOperationExecutor, OperatingSystem operatingSystem, FileResolver fileResolver, ExecActionFactory execActionFactory, CompilerOutputFileNamingSchemeFactory compilerOutputFileNamingSchemeFactory, CompilerMetaDataProviderFactory metaDataProviderFactory, Instantiator instantiator, ExecutorFactory executorFactory) {
+        super(name, buildOperationExecutor, operatingSystem, fileResolver, execActionFactory, compilerOutputFileNamingSchemeFactory, metaDataProviderFactory.clang(), instantiator, executorFactory);
     }
 
     @Override

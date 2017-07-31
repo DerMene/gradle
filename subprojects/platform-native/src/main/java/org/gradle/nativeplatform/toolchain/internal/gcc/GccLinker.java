@@ -17,12 +17,13 @@
 package org.gradle.nativeplatform.toolchain.internal.gcc;
 
 import org.gradle.api.Action;
+import org.gradle.internal.concurrent.ExecutorFactory;
 import org.gradle.internal.operations.BuildOperationExecutor;
 import org.gradle.internal.operations.BuildOperationQueue;
 import org.gradle.nativeplatform.internal.LinkerSpec;
 import org.gradle.nativeplatform.internal.SharedLibraryLinkerSpec;
 import org.gradle.nativeplatform.platform.OperatingSystem;
-import org.gradle.nativeplatform.toolchain.internal.AbstractCompiler;
+import org.gradle.nativeplatform.toolchain.internal.AbstractAsyncCompiler;
 import org.gradle.nativeplatform.toolchain.internal.ArgsTransformer;
 import org.gradle.nativeplatform.toolchain.internal.CommandLineToolContext;
 import org.gradle.nativeplatform.toolchain.internal.CommandLineToolInvocation;
@@ -32,9 +33,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-class GccLinker extends AbstractCompiler<LinkerSpec> {
-    GccLinker(BuildOperationExecutor buildOperationExecutor, CommandLineToolInvocationWorker commandLineToolInvocationWorker, CommandLineToolContext invocationContext, boolean useCommandFile) {
-        super(buildOperationExecutor, commandLineToolInvocationWorker, invocationContext, new GccLinkerArgsTransformer(), useCommandFile);
+class GccLinker extends AbstractAsyncCompiler<LinkerSpec> {
+    GccLinker(BuildOperationExecutor buildOperationExecutor, CommandLineToolInvocationWorker commandLineToolInvocationWorker, CommandLineToolContext invocationContext, boolean useCommandFile, ExecutorFactory executorFactory) {
+        super(buildOperationExecutor, commandLineToolInvocationWorker, invocationContext, new GccLinkerArgsTransformer(), useCommandFile, executorFactory);
     }
 
     @Override

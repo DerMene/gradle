@@ -15,6 +15,7 @@
  */
 package org.gradle.nativeplatform.toolchain.internal.swift;
 
+import org.gradle.internal.concurrent.ExecutorFactory;
 import org.gradle.internal.operations.BuildOperationExecutor;
 import org.gradle.language.base.internal.compile.CompileSpec;
 import org.gradle.language.base.internal.compile.Compiler;
@@ -40,14 +41,16 @@ class SwiftPlatformToolProvider extends AbstractPlatformToolProvider {
     private final ToolSearchPath toolSearchPath;
     private final SwiftcPlatformToolChain toolRegistry;
     private final ExecActionFactory execActionFactory;
+    private final ExecutorFactory executorFactory;
     private final CompilerOutputFileNamingSchemeFactory compilerOutputFileNamingSchemeFactory;
 
-    SwiftPlatformToolProvider(BuildOperationExecutor buildOperationExecutor, OperatingSystemInternal targetOperatingSystem, ToolSearchPath toolSearchPath, SwiftcPlatformToolChain toolRegistry, ExecActionFactory execActionFactory, CompilerOutputFileNamingSchemeFactory compilerOutputFileNamingSchemeFactory) {
+    SwiftPlatformToolProvider(BuildOperationExecutor buildOperationExecutor, OperatingSystemInternal targetOperatingSystem, ToolSearchPath toolSearchPath, SwiftcPlatformToolChain toolRegistry, ExecActionFactory execActionFactory, CompilerOutputFileNamingSchemeFactory compilerOutputFileNamingSchemeFactory, ExecutorFactory executorFactory) {
         super(buildOperationExecutor, targetOperatingSystem);
         this.toolRegistry = toolRegistry;
         this.toolSearchPath = toolSearchPath;
         this.compilerOutputFileNamingSchemeFactory = compilerOutputFileNamingSchemeFactory;
         this.execActionFactory = execActionFactory;
+        this.executorFactory = executorFactory;
     }
 
     @Override
@@ -61,7 +64,7 @@ class SwiftPlatformToolProvider extends AbstractPlatformToolProvider {
     @Override
     protected Compiler<LinkerSpec> createLinker() {
         CommandLineToolConfigurationInternal linkerTool = (CommandLineToolConfigurationInternal) toolRegistry.getLinker();
-        return new SwiftLinker(buildOperationExecutor, commandLineTool(ToolType.LINKER, "swiftc"), context(linkerTool));
+        return new SwiftLinker(buildOperationExecutor, commandLineTool(ToolType.LINKER, "swiftc"), context(linkerTool), executorFactory);
     }
 
     protected Compiler<SwiftCompileSpec> createSwiftCompiler() {

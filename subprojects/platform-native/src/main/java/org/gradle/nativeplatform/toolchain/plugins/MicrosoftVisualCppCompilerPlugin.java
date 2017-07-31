@@ -21,6 +21,7 @@ import org.gradle.api.NamedDomainObjectFactory;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.internal.file.FileResolver;
+import org.gradle.internal.concurrent.ExecutorFactory;
 import org.gradle.internal.operations.BuildOperationExecutor;
 import org.gradle.internal.os.OperatingSystem;
 import org.gradle.internal.reflect.Instantiator;
@@ -53,6 +54,7 @@ public class MicrosoftVisualCppCompilerPlugin implements Plugin<Project> {
         public static void addToolChain(NativeToolChainRegistryInternal toolChainRegistry, ServiceRegistry serviceRegistry) {
             final FileResolver fileResolver = serviceRegistry.get(FileResolver.class);
             final ExecActionFactory execActionFactory = serviceRegistry.get(ExecActionFactory.class);
+            final ExecutorFactory executorFactory = serviceRegistry.get(ExecutorFactory.class);
             final Instantiator instantiator = serviceRegistry.get(Instantiator.class);
             final OperatingSystem operatingSystem = serviceRegistry.get(OperatingSystem.class);
             final BuildOperationExecutor buildOperationExecutor = serviceRegistry.get(BuildOperationExecutor.class);
@@ -63,7 +65,7 @@ public class MicrosoftVisualCppCompilerPlugin implements Plugin<Project> {
 
             toolChainRegistry.registerFactory(VisualCpp.class, new NamedDomainObjectFactory<VisualCpp>() {
                 public VisualCpp create(String name) {
-                return instantiator.newInstance(VisualCppToolChain.class, name, buildOperationExecutor, operatingSystem, fileResolver, execActionFactory, compilerOutputFileNamingSchemeFactory, visualStudioLocator, windowsSdkLocator, ucrtLocator, instantiator);
+                return instantiator.newInstance(VisualCppToolChain.class, name, buildOperationExecutor, operatingSystem, fileResolver, execActionFactory, compilerOutputFileNamingSchemeFactory, visualStudioLocator, windowsSdkLocator, ucrtLocator, instantiator, executorFactory);
                 }
             });
             toolChainRegistry.registerDefaultToolChain(VisualCppToolChain.DEFAULT_NAME, VisualCpp.class);

@@ -21,6 +21,7 @@ import org.gradle.api.NamedDomainObjectFactory;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.internal.file.FileResolver;
+import org.gradle.internal.concurrent.ExecutorFactory;
 import org.gradle.internal.operations.BuildOperationExecutor;
 import org.gradle.internal.os.OperatingSystem;
 import org.gradle.internal.reflect.Instantiator;
@@ -51,6 +52,7 @@ public class GccCompilerPlugin implements Plugin<Project> {
         public static void addToolChain(NativeToolChainRegistryInternal toolChainRegistry, ServiceRegistry serviceRegistry) {
             final FileResolver fileResolver = serviceRegistry.get(FileResolver.class);
             final ExecActionFactory execActionFactory = serviceRegistry.get(ExecActionFactory.class);
+            final ExecutorFactory executorFactory = serviceRegistry.get(ExecutorFactory.class);
             final CompilerOutputFileNamingSchemeFactory compilerOutputFileNamingSchemeFactory = serviceRegistry.get(CompilerOutputFileNamingSchemeFactory.class);
 
             final Instantiator instantiator = serviceRegistry.get(Instantiator.class);
@@ -61,7 +63,7 @@ public class GccCompilerPlugin implements Plugin<Project> {
 
             toolChainRegistry.registerFactory(Gcc.class, new NamedDomainObjectFactory<Gcc>() {
                 public Gcc create(String name) {
-                    return instantiator.newInstance(GccToolChain.class, instantiator, name, buildOperationExecutor, OperatingSystem.current(), fileResolver, execActionFactory, compilerOutputFileNamingSchemeFactory, metaDataProviderFactory);
+                    return instantiator.newInstance(GccToolChain.class, instantiator, name, buildOperationExecutor, OperatingSystem.current(), fileResolver, execActionFactory, compilerOutputFileNamingSchemeFactory, metaDataProviderFactory, executorFactory);
                 }
             });
             toolChainRegistry.registerDefaultToolChain(GccToolChain.DEFAULT_NAME, Gcc.class);

@@ -16,6 +16,7 @@
 
 package org.gradle.nativeplatform.toolchain.internal.msvcpp
 
+import org.gradle.internal.concurrent.ExecutorFactory
 import org.gradle.internal.operations.BuildOperationExecutor
 import org.gradle.internal.os.OperatingSystem
 import org.gradle.nativeplatform.internal.CompilerOutputFileNamingSchemeFactory
@@ -28,7 +29,7 @@ class VisualCppPlatformToolProviderTest extends Specification {
     def "windows shared link file names end with lib"() {
         given:
         def operatingSystem = Mock(OperatingSystemInternal)
-        VisualCppPlatformToolProvider toolProvider = new VisualCppPlatformToolProvider(Mock(BuildOperationExecutor), operatingSystem, [:], Mock(VisualCppInstall), Mock(WindowsSdk), Mock(Ucrt), Mock(NativePlatformInternal), Mock(ExecActionFactory), Mock(CompilerOutputFileNamingSchemeFactory))
+        VisualCppPlatformToolProvider toolProvider = new VisualCppPlatformToolProvider(Mock(BuildOperationExecutor), operatingSystem, [:], Mock(VisualCppInstall), Mock(WindowsSdk), Mock(Ucrt), Mock(NativePlatformInternal), Mock(ExecActionFactory), Mock(CompilerOutputFileNamingSchemeFactory), Mock(ExecutorFactory))
 
         when:
         operatingSystem.getInternalOs() >> OperatingSystem.WINDOWS

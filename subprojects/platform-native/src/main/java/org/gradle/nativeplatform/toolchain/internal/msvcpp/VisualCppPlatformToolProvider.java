@@ -19,6 +19,7 @@ package org.gradle.nativeplatform.toolchain.internal.msvcpp;
 import com.google.common.collect.Lists;
 import org.gradle.api.Transformer;
 import org.gradle.internal.Transformers;
+import org.gradle.internal.concurrent.ExecutorFactory;
 import org.gradle.internal.jvm.Jvm;
 import org.gradle.internal.operations.BuildOperationExecutor;
 import org.gradle.language.base.internal.compile.Compiler;
@@ -48,9 +49,10 @@ class VisualCppPlatformToolProvider extends AbstractPlatformToolProvider {
     private final Ucrt ucrt;
     private final NativePlatformInternal targetPlatform;
     private final ExecActionFactory execActionFactory;
+    private final ExecutorFactory executorFactory;
     private final CompilerOutputFileNamingSchemeFactory compilerOutputFileNamingSchemeFactory;
 
-    VisualCppPlatformToolProvider(BuildOperationExecutor buildOperationExecutor, OperatingSystemInternal operatingSystem, Map<ToolType, CommandLineToolConfigurationInternal> commandLineToolConfigurations, VisualCppInstall visualCpp, WindowsSdk sdk, Ucrt ucrt, NativePlatformInternal targetPlatform, ExecActionFactory execActionFactory, CompilerOutputFileNamingSchemeFactory compilerOutputFileNamingSchemeFactory) {
+    VisualCppPlatformToolProvider(BuildOperationExecutor buildOperationExecutor, OperatingSystemInternal operatingSystem, Map<ToolType, CommandLineToolConfigurationInternal> commandLineToolConfigurations, VisualCppInstall visualCpp, WindowsSdk sdk, Ucrt ucrt, NativePlatformInternal targetPlatform, ExecActionFactory execActionFactory, CompilerOutputFileNamingSchemeFactory compilerOutputFileNamingSchemeFactory, ExecutorFactory executorFactory) {
         super(buildOperationExecutor, operatingSystem);
         this.commandLineToolConfigurations = commandLineToolConfigurations;
         this.visualCpp = visualCpp;
@@ -59,6 +61,7 @@ class VisualCppPlatformToolProvider extends AbstractPlatformToolProvider {
         this.targetPlatform = targetPlatform;
         this.execActionFactory = execActionFactory;
         this.compilerOutputFileNamingSchemeFactory = compilerOutputFileNamingSchemeFactory;
+        this.executorFactory = executorFactory;
     }
 
     @Override
@@ -121,7 +124,7 @@ class VisualCppPlatformToolProvider extends AbstractPlatformToolProvider {
     @Override
     protected Compiler<LinkerSpec> createLinker() {
         CommandLineToolInvocationWorker commandLineTool = tool("Linker", visualCpp.getLinker(targetPlatform));
-        return new LinkExeLinker(buildOperationExecutor, commandLineTool, context(commandLineToolConfigurations.get(ToolType.LINKER)), addLibraryPath());
+        return new LinkExeLinker(buildOperationExecutor, commandLineTool, context(commandLineToolConfigurations.get(ToolType.LINKER)), addLibraryPath(), executorFactory);
     }
 
     @Override

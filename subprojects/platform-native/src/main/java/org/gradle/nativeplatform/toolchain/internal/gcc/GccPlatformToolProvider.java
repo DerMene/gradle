@@ -15,6 +15,7 @@
  */
 package org.gradle.nativeplatform.toolchain.internal.gcc;
 
+import org.gradle.internal.concurrent.ExecutorFactory;
 import org.gradle.internal.operations.BuildOperationExecutor;
 import org.gradle.language.base.internal.compile.Compiler;
 import org.gradle.nativeplatform.internal.CompilerOutputFileNamingSchemeFactory;
@@ -47,16 +48,18 @@ class GccPlatformToolProvider extends AbstractPlatformToolProvider {
     private final ToolSearchPath toolSearchPath;
     private final ToolRegistry toolRegistry;
     private final ExecActionFactory execActionFactory;
+    private final ExecutorFactory executorFactory;
     private final CompilerOutputFileNamingSchemeFactory compilerOutputFileNamingSchemeFactory;
     private final boolean useCommandFile;
 
-    GccPlatformToolProvider(BuildOperationExecutor buildOperationExecutor, OperatingSystemInternal targetOperatingSystem, ToolSearchPath toolSearchPath, ToolRegistry toolRegistry, ExecActionFactory execActionFactory, CompilerOutputFileNamingSchemeFactory compilerOutputFileNamingSchemeFactory, boolean useCommandFile) {
+    GccPlatformToolProvider(BuildOperationExecutor buildOperationExecutor, OperatingSystemInternal targetOperatingSystem, ToolSearchPath toolSearchPath, ToolRegistry toolRegistry, ExecActionFactory execActionFactory, CompilerOutputFileNamingSchemeFactory compilerOutputFileNamingSchemeFactory, boolean useCommandFile, ExecutorFactory executorFactory) {
         super(buildOperationExecutor, targetOperatingSystem);
         this.toolRegistry = toolRegistry;
         this.toolSearchPath = toolSearchPath;
         this.compilerOutputFileNamingSchemeFactory = compilerOutputFileNamingSchemeFactory;
         this.useCommandFile = useCommandFile;
         this.execActionFactory = execActionFactory;
+        this.executorFactory = executorFactory;
     }
 
     @Override
@@ -126,7 +129,7 @@ class GccPlatformToolProvider extends AbstractPlatformToolProvider {
     @Override
     protected Compiler<LinkerSpec> createLinker() {
         GccCommandLineToolConfigurationInternal linkerTool = toolRegistry.getTool(ToolType.LINKER);
-        return new GccLinker(buildOperationExecutor, commandLineTool(linkerTool), context(linkerTool), useCommandFile);
+        return new GccLinker(buildOperationExecutor, commandLineTool(linkerTool), context(linkerTool), useCommandFile, executorFactory);
     }
 
     @Override
