@@ -35,7 +35,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -143,6 +145,20 @@ public class ChmodBenchmark {
             permissionsToSet = WEIRD_JAVA7_FILE_PERMISSIONS;
         }
         Files.setPosixFilePermissions(file, permissionsToSet);
+        blackhole.consume(file);
+    }
+
+    @Benchmark
+    public void createFileJava7WithMixedPermissions(Blackhole blackhole) throws IOException {
+        int incrementAndGet = counter.incrementAndGet();
+        Set<PosixFilePermission> permissionsToSet;
+        if (incrementAndGet % 2 == 0) {
+            permissionsToSet = DEFAULT_JAVA7_FILE_PERMISSIONS;
+        } else {
+            permissionsToSet = WEIRD_JAVA7_FILE_PERMISSIONS;
+        }
+        FileAttribute<Set<PosixFilePermission>> fileAttributes = PosixFilePermissions.asFileAttribute(permissionsToSet);
+        Path file = Files.createFile(tempDirPath.resolve("file-" + incrementAndGet), fileAttributes);
         blackhole.consume(file);
     }
 
