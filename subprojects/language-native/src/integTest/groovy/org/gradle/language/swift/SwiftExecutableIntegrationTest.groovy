@@ -59,7 +59,54 @@ class SwiftExecutableIntegrationTest extends AbstractInstalledToolChainIntegrati
         expect:
         succeeds "assemble"
         result.assertTasksExecuted(":compileSwift", ":linkMain", ":installMain", ":assemble")
-        executable("build/exe/app").exec().out == app.englishOutput
+        executable("build/exe/app").assertExists()
+        installation("build/install/app").exec().out == app.englishOutput
+    }
+
+    def "honors changes to buildDir"() {
+        settingsFile << "rootProject.name = 'app'"
+        def app = new SwiftHelloWorldApp()
+
+        given:
+        app.writeSources(file('src/main'))
+
+        and:
+        buildFile << """
+            apply plugin: 'swift-executable'
+            buildDir = 'output'
+         """
+
+        expect:
+        succeeds "assemble"
+        result.assertTasksExecuted(":compileSwift", ":linkMain", ":installMain", ":assemble")
+
+        !file("build").exists()
+        file("output/main/objs").assertIsDir()
+        executable("output/exe/app").assertExists()
+        installation("output/install/app").exec().out == app.englishOutput
+    }
+
+    def "honors changes to task output locations"() {
+        settingsFile << "rootProject.name = 'app'"
+        def app = new SwiftHelloWorldApp()
+
+        given:
+        app.writeSources(file('src/main'))
+
+        and:
+        buildFile << """
+            apply plugin: 'swift-executable'
+            compileSwift.objectFileDirectory.set(layout.buildDirectory.dir("object-files"))
+            linkMain.binaryFile.set(layout.buildDirectory.file("exe/some-app.exe"))
+            installMain.installDirectory.set(layout.buildDirectory.dir("some-app"))
+         """
+
+        expect:
+        succeeds "assemble"
+        result.assertTasksExecuted(":compileSwift", ":linkMain", ":installMain", ":assemble")
+
+        file("build/exe/some-app.exe").assertExists()
+        installation("build/some-app").exec().out == app.englishOutput
     }
 
     def "can compile and link against a library"() {
@@ -94,7 +141,7 @@ ${f.text}"""
         sharedLibrary("app/build/install/app/lib/Greeter").file.assertExists()
     }
 
-    def "can compile and link against library with api dependencies"() {
+    def "can compile and link against library with API dependencies"() {
         settingsFile << "include 'app', 'Hello', 'Greeting'"
         def app = new ExeWithLibraryUsingSwiftLibraryHelloWorldApp()
 
