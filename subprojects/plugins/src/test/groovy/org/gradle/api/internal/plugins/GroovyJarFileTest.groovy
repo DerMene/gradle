@@ -19,6 +19,7 @@ import org.gradle.util.VersionNumber
 import spock.lang.Specification
 import spock.lang.Unroll
 
+
 class GroovyJarFileTest extends Specification {
     def "parse non-Groovy file"() {
         expect:
